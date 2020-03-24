@@ -13,6 +13,10 @@ from gpiozero import OutputDevice
 import re
 # For the sleep method, used to keeping the fan on.
 import time
+# For removing the old log.
+import os
+# For logging the current time at the beginning of the log.
+import datetime
 
 # This is the GPIO pin that's connected to the transistor.
 GPIO_PIN = 17
@@ -24,14 +28,27 @@ HIGH = 55
 LOW = 45
 # This defines a minute in seconds, used for timing the fan on time.
 MINUTE = 60
+# This defines the file name of the local log file.
+FILE_NAME = 'log.txt'
 
 # Method to automatic control the fan on the board.
 def auto_fan_control():
+    # Remove the existing log file.
+    try:
+        os.remove(FILE_NAME)
+    except OSError:
+        pass
+
+    # Log the starting time.
+    log(str(datetime.datetime.now()))
+
     # Read the current temperature.
     temp = read_temp()
     # If it's too hot, turn the fan on.
     if is_too_hot(temp):
-        print("The fan was turned on because the Pi's current temperature exceeds the trigger value of " + str(HIGH) + "'C.")
+        info = "The fan was turned on because the Pi's current temperature exceeds the trigger value of " + str(HIGH) + "'C."
+        print(info)
+        log(info)
         
         # Track the duration that the fan has been on.
         start_time = time.time()
@@ -40,10 +57,18 @@ def auto_fan_control():
 
         end_time = time.time()
         duration = end_time - start_time
-        print('The fan was on for ' + str(duration) + ' seconds.')
+
+        info = 'The fan was on for ' + str(duration) + ' seconds.'
+        print(info)
+        log(info)
     else:
-        print('The current board temperature is not hot enough to turn on the fan.')
-        print('The triggering temp value is: ' + str(HIGH) + "'C.")
+        info = 'The current board temperature is not hot enough to turn on the fan.'
+        print(info)
+        log(info)
+
+        info = 'The triggering temp value is: ' + str(HIGH) + "'C."
+        print(info)
+        log(info)
 
 # Method to run the fan until the board temperature is below the lower bound limit.
 def cool_down():
@@ -58,7 +83,10 @@ def cool_down():
     
     # When the while loop exits, we know that the board temp is below the lower bound limit.
     fan_off()
-    print("The fan was turned off because the Pi's current temperature is below the trigger value of " + str(LOW) + "'C.")
+    
+    info = "The fan was turned off because the Pi's current temperature is below the trigger value of " + str(LOW) + "'C."
+    print(info)
+    log(info)
 
 # Function to read and output the Pi's current temperature.
 def read_temp():
@@ -82,7 +110,10 @@ def read_temp():
     # the first element in the list to a float.
     temp_array = re.findall(r'[-+]?\d*\.\d+|\d+', o)
     temp = float(temp_array[0])
-    print('The current temp is: ' + str(temp))
+    
+    info = 'The current temp is: ' + str(temp)
+    print(info)
+    log(info)
     return temp
 
 # Function that determines if the passed in temperature is too hot so that we need
@@ -102,6 +133,11 @@ def fan_on():
 # Method to turn the fan off (to set the GPIO bit to low).
 def fan_off():
     FAN.off()
+
+# Method to write to the local log file.
+def log(content):
+    with open(FILE_NAME, 'a') as file:
+        file.write(content + '\n')
 
 # Execute the method.
 auto_fan_control()
