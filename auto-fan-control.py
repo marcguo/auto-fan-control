@@ -5,7 +5,6 @@ from the script.
 This script can be run using an auto-scheduler.
 '''
 
-
 # For issuing shell commands.
 import subprocess
 # For controlling GPIO pins.
