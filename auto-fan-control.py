@@ -28,8 +28,10 @@ HIGH = 55
 LOW = 45
 # This defines a minute in seconds, used for timing the fan on time.
 MINUTE = 60
+# This defines the current Python file's path.
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 # This defines the file name of the local log file.
-FILE_NAME = 'log.txt'
+FILE_NAME = DIR_PATH + '/log.txt'
 
 # Method to automatic control the fan on the board.
 def auto_fan_control():
@@ -111,7 +113,7 @@ def read_temp():
     temp_array = re.findall(r'[-+]?\d*\.\d+|\d+', o)
     temp = float(temp_array[0])
     
-    info = 'The current temp is: ' + str(temp)
+    info = 'The current temp is: ' + str(temp) + "'C."
     print(info)
     log(info)
     return temp
