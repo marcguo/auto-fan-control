@@ -77,11 +77,21 @@ def cool_down():
     # Set the temp to HIGH just so that the while loop does not quit before the code
     # even runs...
     temp = HIGH
+    # Keep track of the total duration.
+    duration = 0
 
     while not is_cool_enough(temp):
         fan_on()
         time.sleep(MINUTE)
+        duration += MINUTE
         temp = read_temp()
+        # Turn off the fan if it's been running for 4 minutes. The next scheduled run will handle
+        # the rest.
+        if duration >= 4 * MINUTE:
+            fan_off()
+            info = 'The fan was turned off because the program has exceeded its timeout of 4 minutes.'
+            print(info)
+            log(info)
     
     # When the while loop exits, we know that the board temp is below the lower bound limit.
     fan_off()
