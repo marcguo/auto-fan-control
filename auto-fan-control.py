@@ -92,6 +92,7 @@ def cool_down():
             info = 'The fan was turned off because the program has exceeded its timeout of 4 minutes.'
             print(info)
             log(info)
+            return
     
     # When the while loop exits, we know that the board temp is below the lower bound limit.
     fan_off()
